@@ -1,4 +1,4 @@
-name: Github Metrics 
+name: Github Metrics
 
 defaults:
   target_name: github-snowflake
@@ -11,11 +11,11 @@ targets:
     db_schema: {{ env_var('GITHUB_SNOWFLAKE_DB_SCHEMA') }}
     username: {{ env_var('GITHUB_SNOWFLAKE_USERNAME') }}
     warehouse: {{ env_var('GITHUB_SNOWFLAKE_WAREHOUSE') }}
-    password: {{ env_var('GITHUB_SNOWFLAKE_PASSWORK') }}
+    password: {{ env_var('GITHUB_SNOWFLAKE_PASSWORD') }}
 
 models:
   - name: github
-    sql: "SELECT * FROM github"
+    sql: "SELECT _id FROM GITHUB"
 
 traces:
   - name: Pull Request Reviews by Person
@@ -24,3 +24,18 @@ traces:
       x_data: x
     props:
       type: bar
+      x: query( _id )
+      y: query( _id )
+
+dashboards:
+  - name: Github Metrics
+    rows:
+      - height: medium
+        items:
+          - width: 9
+            chart:
+              name: Pull Requests
+              traces:
+                - ref(Pull Request Reviews by Person)
+              layout:
+                title: "Pull Request Reviews by Person"
