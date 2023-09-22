@@ -24,6 +24,7 @@ This dashboard uses a Fivetran Webhook to Snowflake pipeline.  Fivetran has a gr
 ### Github
 
 1. Click `Settings` > `Webhooks`
+1. Set the url from the connector above
 2. Create a new webhook and choose "everything"
 
 ### Back in Fivetran
