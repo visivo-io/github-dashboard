@@ -34,6 +34,12 @@ This dashboard uses a Fivetran Webhook to Snowflake pipeline.  Fivetran has a gr
 ## Installation
 
 1. Include the repo in your project's `includes`
-2. Set the needed environment variables:
-   1. DB
-   2. DB_USERNAME
+2. Set the needed environment variables. Example `.env` contents:
+```
+GITHUB_SNOWFLAKE_ACCOUNT=asdf.host.aws
+GITHUB_SNOWFLAKE_DATABASE=GITHUB
+GITHUB_SNOWFLAKE_DB_SCHEMA=WEBHOOKS
+GITHUB_SNOWFLAKE_USERNAME=GITHUB
+GITHUB_SNOWFLAKE_WAREHOUSE=DEV
+GITHUB_SNOWFLAKE_PASSWORD=super_secret_password
+```
