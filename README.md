@@ -4,7 +4,7 @@
 
 This dashboard uses a Fivetran Webhook to Snowflake pipeline.  Fivetran has a great way to consume webhooks and store them in a database.
 
-## Prequesites
+## Prerequisites
 
 1. Snowflake database
 2. Fivetran account
