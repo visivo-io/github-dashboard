@@ -15,16 +15,16 @@ targets:
 
 models:
   - name: github
-    sql: "SELECT _id FROM GITHUB"
+    sql: "SELECT _id, action FROM GITHUB"
 
 traces:
   - name: Pull Request Reviews by Person
     model: ref(github)
     columns:
-      x_data: x
+      x_data: action
     props:
       type: bar
-      x: query( _id )
+      x: column(x_data)
       y: query( _id )
 
 dashboards:
