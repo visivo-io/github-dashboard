@@ -6,36 +6,96 @@ defaults:
 targets:
   - name: github-snowflake
     type: snowflake
-    database: {{ env_var('GITHUB_SNOWFLAKE_DATABASE') }}
-    account: {{ env_var('GITHUB_SNOWFLAKE_ACCOUNT') }}
-    db_schema: {{ env_var('GITHUB_SNOWFLAKE_DB_SCHEMA') }}
-    username: {{ env_var('GITHUB_SNOWFLAKE_USERNAME') }}
-    warehouse: {{ env_var('GITHUB_SNOWFLAKE_WAREHOUSE') }}
-    password: {{ env_var('GITHUB_SNOWFLAKE_PASSWORD') }}
+    database: "{{ env_var('GITHUB_SNOWFLAKE_DATABASE') }}"
+    account: "{{ env_var('GITHUB_SNOWFLAKE_ACCOUNT') }}"
+    db_schema: "{{ env_var('GITHUB_SNOWFLAKE_DB_SCHEMA') }}"
+    username: "{{ env_var('GITHUB_SNOWFLAKE_USERNAME') }}"
+    warehouse: "{{ env_var('GITHUB_SNOWFLAKE_WAREHOUSE') }}"
+    password: "{{ env_var('GITHUB_SNOWFLAKE_PASSWORD') }}"
 
 models:
-  - name: github
-    sql: "SELECT _id, action FROM GITHUB"
+  - name: opened github pull requests
+    sql: |
+      SELECT 
+          action, 
+          repository:name::varchar as name, 
+          pull_request:user:login::varchar as author
+          FROM GITHUB 
+        WHERE pull_request IS NOT NULL AND
+        number IS NOT NULL AND 
+        action = 'opened'
+  - name: submitted github pull requests reviews
+    sql: |
+      SELECT 
+          action, 
+          repository:name::varchar as name, 
+          review:user:login::varchar as reviewer
+          FROM GITHUB 
+        WHERE review IS NOT NULL AND
+        action = 'submitted'
 
 traces:
-  - name: Pull Request Reviews by Person
-    model: ref(github)
-    columns:
-      x_data: action
+  - name: Pull Request by Repository
+    model: ref(opened github pull requests)
+    cohort_on: name
     props:
       type: bar
-      x: column(x_data)
-      y: query( _id )
+      x: query( name )
+      y: query( count(*) )
+  - name: Pull Request by User
+    model: ref(opened github pull requests)
+    cohort_on: author
+    props:
+      type: bar
+      x: query( author )
+      y: query( count(*) )
+  - name: Pull Request Reviews by Repository
+    model: ref(submitted github pull requests reviews)
+    cohort_on: name
+    props:
+      type: bar
+      x: query( name )
+      y: query( count(*) )
+  - name: Pull Request Reviews by User
+    model: ref(submitted github pull requests reviews)
+    cohort_on: reviewer
+    props:
+      type: bar
+      x: query( reviewer )
+      y: query( count(*) )
 
 dashboards:
   - name: Github Metrics
     rows:
       - height: medium
         items:
-          - width: 9
+          - width: 5
             chart:
-              name: Pull Requests
+              name: Pull Requests by Repository
               traces:
-                - ref(Pull Request Reviews by Person)
+                - ref(Pull Request by Repository)
               layout:
-                title: "Pull Request Reviews by Person"
+                title: "Pull Request by Repository"
+          - width: 5
+            chart:
+              name: Pull Requests by User
+              traces:
+                - ref(Pull Request by User)
+              layout:
+                title: "Pull Request by User"
+      - height: medium
+        items:
+          - width: 5
+            chart:
+              name: Pull Requests Reviews by Repository
+              traces:
+                - ref(Pull Request Reviews by Repository)
+              layout:
+                title: "Pull Request Reviews by Repository"
+          - width: 5
+            chart:
+              name: Pull Requests Reviews by User
+              traces:
+                - ref(Pull Request Reviews by User)
+              layout:
+                title: "Pull Request Reviews by User"
