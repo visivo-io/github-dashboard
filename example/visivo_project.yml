@@ -1,0 +1,30 @@
+name: "Github Metrics"
+
+targets:
+  - name: snowflake
+    type: snowflake
+    database: RAW
+    warehouse: DEV
+    db_schema: WEBHOOKS
+    username: GITHUB
+    password: "{{env_var('GITHUB_SNOWFLAKE_PASSWORD')}}"
+    account: "{{env_var('GITHUB_SNOWFLAKE_ACCOUNT')}}"
+
+includes:
+  - path: "visivo-io/github-dashboard.git@1.0"
+
+dashboards:
+  - name: Github Metrics change
+    rows:
+      - height: medium
+        items:
+          - width: 5
+            chart: ref(Pull Requests by Repository)
+          - width: 5
+            chart: ref(Pull Requests by User)
+      - height: medium
+        items:
+          - width: 5
+            chart: ref(Pull Requests Reviews by Repository)
+          - width: 5
+            chart: ref(Pull Requests Reviews by User)

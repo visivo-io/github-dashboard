@@ -2,11 +2,11 @@
 
 # Usage
 
-This dashboard uses a Fivetran Webhook to Snowflake pipeline.  Fivetran has a great way to consume webhooks and store them in a database.
+This dashboard uses a Fivetran Webhook to Warehouse pipeline.  Fivetran has a great way to consume webhooks and store them in a database.
 
-## Prequesites
+## Prerequisites
 
-1. Snowflake database
+1. Warehouse database
 2. Fivetran account
 3. Github repository
 
@@ -33,13 +33,30 @@ This dashboard uses a Fivetran Webhook to Snowflake pipeline.  Fivetran has a gr
 
 ## Installation
 
-1. Include the repo in your project's `includes`
-2. Set the needed environment variables. Example `.env` contents:
+1. Include the repo in your project's `includes`:
 ```
-GITHUB_SNOWFLAKE_ACCOUNT=asdf.host.aws
-GITHUB_SNOWFLAKE_DATABASE=GITHUB
-GITHUB_SNOWFLAKE_DB_SCHEMA=WEBHOOKS
-GITHUB_SNOWFLAKE_USERNAME=GITHUB
-GITHUB_SNOWFLAKE_WAREHOUSE=DEV
-GITHUB_SNOWFLAKE_PASSWORD=super_secret_password
+includes:
+  - path: "visivo-io/github-dashboard@main"
+```
+2. Set the needed environment variable. Example `.env` contents:
+```
+GITHUB_TARGET=name_of_target_where_webooks_are_stored
+```
+1. Build a dashboard with the available charts in your project:
+```
+dashboards:
+  - name: Github Metrics
+    rows:
+      - height: medium
+        items:
+          - width: 5
+            chart: ref(Pull Requests by Repository)
+          - width: 5
+            chart: ref(Pull Requests by Repository)
+      - height: medium
+        items:
+          - width: 5
+            chart: ref(Pull Requests Reviews by Repository)
+          - width: 5
+            chart: ref(Pull Requests Reviews by User)
 ```
