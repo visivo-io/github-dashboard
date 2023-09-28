@@ -52,7 +52,7 @@ dashboards:
           - width: 5
             chart: ref(Pull Requests by Repository)
           - width: 5
-            chart: ref(Pull Requests by Repository)
+            chart: ref(Pull Requests by User)
       - height: medium
         items:
           - width: 5
