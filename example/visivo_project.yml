@@ -11,7 +11,7 @@ targets:
     account: "{{env_var('GITHUB_SNOWFLAKE_ACCOUNT')}}"
 
 includes:
-  - path: "visivo-io/github-dashboard.git@1.0"
+  - path: "visivo-io/github-dashboard.git@v1.0"
 
 dashboards:
   - name: Github Metrics change
