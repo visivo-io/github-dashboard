@@ -1,18 +1,5 @@
 name: Github Metrics
 
-defaults:
-  target_name: github-snowflake
-
-targets:
-  - name: github-snowflake
-    type: snowflake
-    database: "{{ env_var('GITHUB_SNOWFLAKE_DATABASE') }}"
-    account: "{{ env_var('GITHUB_SNOWFLAKE_ACCOUNT') }}"
-    db_schema: "{{ env_var('GITHUB_SNOWFLAKE_DB_SCHEMA') }}"
-    username: "{{ env_var('GITHUB_SNOWFLAKE_USERNAME') }}"
-    warehouse: "{{ env_var('GITHUB_SNOWFLAKE_WAREHOUSE') }}"
-    password: "{{ env_var('GITHUB_SNOWFLAKE_PASSWORD') }}"
-
 models:
   - name: opened github pull requests
     sql: |
@@ -38,6 +25,7 @@ traces:
   - name: Pull Request by Repository
     model: ref(opened github pull requests)
     cohort_on: name
+    target_name: "{{env_var('GITHUB_TARGET')}}"
     props:
       type: bar
       x: query( name )
@@ -45,6 +33,7 @@ traces:
   - name: Pull Request by User
     model: ref(opened github pull requests)
     cohort_on: author
+    target_name: "{{env_var('GITHUB_TARGET')}}"
     props:
       type: bar
       x: query( author )
@@ -52,6 +41,7 @@ traces:
   - name: Pull Request Reviews by Repository
     model: ref(submitted github pull requests reviews)
     cohort_on: name
+    target_name: "{{env_var('GITHUB_TARGET')}}"
     props:
       type: bar
       x: query( name )
@@ -59,43 +49,30 @@ traces:
   - name: Pull Request Reviews by User
     model: ref(submitted github pull requests reviews)
     cohort_on: reviewer
+    target_name: "{{env_var('GITHUB_TARGET')}}"
     props:
       type: bar
       x: query( reviewer )
       y: query( count(*) )
 
-dashboards:
-  - name: Github Metrics
-    rows:
-      - height: medium
-        items:
-          - width: 5
-            chart:
-              name: Pull Requests by Repository
-              traces:
-                - ref(Pull Request by Repository)
-              layout:
-                title: "Pull Request by Repository"
-          - width: 5
-            chart:
-              name: Pull Requests by User
-              traces:
-                - ref(Pull Request by User)
-              layout:
-                title: "Pull Request by User"
-      - height: medium
-        items:
-          - width: 5
-            chart:
-              name: Pull Requests Reviews by Repository
-              traces:
-                - ref(Pull Request Reviews by Repository)
-              layout:
-                title: "Pull Request Reviews by Repository"
-          - width: 5
-            chart:
-              name: Pull Requests Reviews by User
-              traces:
-                - ref(Pull Request Reviews by User)
-              layout:
-                title: "Pull Request Reviews by User"
+charts:
+  - name: Pull Requests by Repository
+    traces:
+      - ref(Pull Request by Repository)
+    layout:
+      title: "Pull Request by Repository"
+  - name: Pull Requests by User
+    traces:
+      - ref(Pull Request by User)
+    layout:
+      title: "Pull Request by User"
+  - name: Pull Requests Reviews by Repository
+    traces:
+      - ref(Pull Request Reviews by Repository)
+    layout:
+      title: "Pull Request Reviews by Repository"
+  - name: Pull Requests Reviews by User
+    traces:
+      - ref(Pull Request Reviews by User)
+    layout:
+      title: "Pull Request Reviews by User"

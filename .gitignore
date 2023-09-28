@@ -2,3 +2,4 @@
 .DS_Store
 target
 venv
+.visivo_cache
