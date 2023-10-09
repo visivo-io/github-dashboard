@@ -12,10 +12,19 @@ targets:
 
 includes:
   - path: "visivo-io/github-dashboard.git@v1.0"
+  #- path: "../visivo_project.yml" #can use for local development of the package
 
 dashboards:
   - name: Github Metrics change
     rows:
+      - height: small 
+        items:
+          - width: 1
+            chart: ref(Average Cycle Time Big Number)
+          - width: 1
+            chart: ref(Pull Request Opens Big Number)
+          - width: 1
+            chart: ref(Pull Request Reviews Big Number)
       - height: medium
         items:
           - width: 5
@@ -28,3 +37,9 @@ dashboards:
             chart: ref(Pull Requests Reviews by Repository)
           - width: 5
             chart: ref(Pull Requests Reviews by User)
+      - height: medium
+        items:
+          - width: 5
+            chart: ref(Cycle Time in the Past 30 days By Repository)
+          - width: 5
+            chart: ref(Cycle Time in the Past 30 days By User)
