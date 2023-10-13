@@ -1,6 +1,20 @@
 name: Github Metrics
 
 models:
+  - name: closed github pull requests 
+    sql: |
+      Select
+          number as pull_request_number,
+          repository:name::varchar as repo, 
+          pull_request:created_at::timestamp_tz as created_at,
+          pull_request:closed_at::timestamp_tz as closed_at,
+          pull_request:merged_at::timestamp_tz as merged_at,
+          round(datediff('minute', created_at, merged_at)/60, 2) as cycle_time_hrs,
+          pull_request:user:login::varchar as author
+      FROM github 
+      where pull_request is not null
+        AND action = 'closed'
+        AND pull_request:merged::boolean 
   - name: opened github pull requests
     sql: |
       SELECT 
@@ -22,6 +36,76 @@ models:
         action = 'submitted'
 
 traces:
+  - name: Average Cycle Time Indicator
+    model: ref(closed github pull requests)
+    target_name: "{{env_var('GITHUB_TARGET')}}"
+    columns: 
+      cycle_time: avg(cycle_time_hrs)
+    props:
+      type: indicator
+      value: column(cycle_time)[0]
+      title: 
+        text: Average Cycle Hours
+  - name: Pull Request Reviews Indicator
+    model: ref(submitted github pull requests reviews)
+    target_name: "{{env_var('GITHUB_TARGET')}}"
+    columns: 
+      pr_reviews: count(*)
+    props:
+      type: indicator
+      value: column(pr_reviews)[0]
+      title: 
+        text: PR Reviews All Time
+  - name: Pull Request Opens Indicator
+    model: ref(opened github pull requests)
+    target_name: "{{env_var('GITHUB_TARGET')}}"
+    columns: 
+      pr_opens: count(*)
+    props:
+      type: indicator
+      value: column(pr_opens)[0]
+      title: 
+        text: PR Opens All Time
+  - name: Average Cycle Time By Repository This Month
+    model: ref(closed github pull requests)
+    cohort_on: "'Average'"
+    target_name: "{{env_var('GITHUB_TARGET')}}"
+    props:
+      type: bar 
+      x: query( repo )
+      y: query( avg(cycle_time_hrs) )
+    filters: 
+      - query(datediff('day', created_at::date, current_date::date ) <= 30)
+  - name: Median Cycle Time By Repository This Month
+    model: ref(closed github pull requests)
+    cohort_on: "'Median'"
+    target_name: "{{env_var('GITHUB_TARGET')}}"
+    props:
+      type: bar 
+      x: query( repo )
+      y: query( median(cycle_time_hrs) )
+    filters: 
+      - query(datediff('day', created_at::date, current_date::date ) <= 30)
+  - name: Average Cycle Time By User This Month
+    model: ref(closed github pull requests)
+    cohort_on: "'Average'"
+    target_name: "{{env_var('GITHUB_TARGET')}}"
+    props:
+      type: bar 
+      x: query( author )
+      y: query( avg(cycle_time_hrs) )
+    filters: 
+      - query(datediff('day', created_at::date, current_date::date ) <= 30)
+  - name: Median Cycle Time By User This Month
+    model: ref(closed github pull requests)
+    cohort_on: "'Median'"
+    target_name: "{{env_var('GITHUB_TARGET')}}"
+    props:
+      type: bar 
+      x: query( author )
+      y: query( median(cycle_time_hrs) )
+    filters: 
+      - query(datediff('day', created_at::date, current_date::date ) <= 30)
   - name: Pull Request by Repository
     model: ref(opened github pull requests)
     cohort_on: name
@@ -56,6 +140,18 @@ traces:
       y: query( count(*) )
 
 charts:
+  - name: Cycle Time in the Past 30 days By Repository
+    traces: 
+      - ref(Average Cycle Time By Repository This Month)
+      - ref(Median Cycle Time By Repository This Month)
+    layout: 
+      title: Cycle Hours in the Past 30 days By Repository
+  - name: Cycle Time in the Past 30 days By User
+    traces: 
+      - ref(Average Cycle Time By User This Month)
+      - ref(Median Cycle Time By User This Month)
+    layout: 
+      title: Cycle Hours in the Past 30 days By User
   - name: Pull Requests by Repository
     traces:
       - ref(Pull Request by Repository)
@@ -76,3 +172,12 @@ charts:
       - ref(Pull Request Reviews by User)
     layout:
       title: "Pull Request Reviews by User"
+  - name: Average Cycle Time Big Number
+    traces: 
+      - ref(Average Cycle Time Indicator)
+  - name: Pull Request Opens Big Number
+    traces: 
+      - ref(Pull Request Opens Indicator)
+  - name: Pull Request Reviews Big Number
+    traces: 
+      - ref(Pull Request Reviews Indicator)
