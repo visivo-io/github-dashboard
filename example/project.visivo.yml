@@ -11,13 +11,13 @@ targets:
     account: "{{env_var('GITHUB_SNOWFLAKE_ACCOUNT')}}"
 
 includes:
-  - path: "visivo-io/github-dashboard.git@v1.0"
-  #- path: "../visivo_project.yml" #can use for local development of the package
+  # - path: "visivo-io/github-dashboard.git@v1.0"
+  - path: "../visivo_project.yml" #can use for local development of the package
 
 dashboards:
   - name: Github Metrics change
     rows:
-      - height: small 
+      - height: small
         items:
           - width: 1
             chart: ref(Average Cycle Time Big Number)
