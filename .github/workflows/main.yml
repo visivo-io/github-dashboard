@@ -24,6 +24,10 @@ jobs:
           cd example
           visivo dist
           cd ..
+        env:
+          VISIVO_GITHUB_SNOWFLAKE_ACCOUNT: ${{secrets.VISIVO_GITHUB_SNOWFLAKE_ACCOUNT}}
+          VISIVO_GITHUB_SNOWFLAKE_PASSWORD: ${{secrets.VISIVO_GITHUB_SNOWFLAKE_PASSWORD}}
+          VISIVO_GITHUB_TARGET: ${{secrets.VISIVO_GITHUB_TARGET}}
           
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
