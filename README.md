@@ -1,8 +1,10 @@
 # Visivo Github Dashboard
 
-# Example
+# Demo
 
-The [example](example) folder has a complete working example.  It is deployed with `visivo dist` to Netlify to and is available [here](https://visivo-github-dashboard.netlify.app/).
+[Here is the deployed dashboard](https://visivo-github-dashboard.netlify.app/)
+
+This dashboard is built from this plugin and is deployed with `visivo dist` to Netlify.
 
 # Usage
 
