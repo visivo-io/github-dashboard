@@ -1,7 +1,8 @@
 name: Github Metrics
 
 models:
-  - name: closed github pull requests 
+  - name: closed github pull requests
+    target: ref({{env_var('GITHUB_TARGET')}})
     sql: |
       Select
           number as pull_request_number,
@@ -14,8 +15,9 @@ models:
       FROM github 
       where pull_request is not null
         AND action = 'closed'
-        AND pull_request:merged::boolean 
+        AND pull_request:merged::boolean
   - name: opened github pull requests
+    target: ref({{env_var('GITHUB_TARGET')}})
     sql: |
       SELECT 
           action, 
@@ -26,6 +28,7 @@ models:
         number IS NOT NULL AND 
         action = 'opened'
   - name: submitted github pull requests reviews
+    target: ref({{env_var('GITHUB_TARGET')}})
     sql: |
       SELECT 
           action, 
@@ -38,78 +41,70 @@ models:
 traces:
   - name: Average Cycle Time Indicator
     model: ref(closed github pull requests)
-    target_name: "{{env_var('GITHUB_TARGET')}}"
-    columns: 
+    columns:
       cycle_time: avg(cycle_time_hrs)
     props:
       type: indicator
       value: column(cycle_time)[0]
-      title: 
+      title:
         text: Average Cycle Hours
   - name: Pull Request Reviews Indicator
     model: ref(submitted github pull requests reviews)
-    target_name: "{{env_var('GITHUB_TARGET')}}"
-    columns: 
+    columns:
       pr_reviews: count(*)
     props:
       type: indicator
       value: column(pr_reviews)[0]
-      title: 
+      title:
         text: PR Reviews All Time
   - name: Pull Request Opens Indicator
     model: ref(opened github pull requests)
-    target_name: "{{env_var('GITHUB_TARGET')}}"
-    columns: 
+    columns:
       pr_opens: count(*)
     props:
       type: indicator
       value: column(pr_opens)[0]
-      title: 
+      title:
         text: PR Opens All Time
   - name: Average Cycle Time By Repository This Month
     model: ref(closed github pull requests)
     cohort_on: "'Average'"
-    target_name: "{{env_var('GITHUB_TARGET')}}"
     props:
-      type: bar 
+      type: bar
       x: query( repo )
       y: query( avg(cycle_time_hrs) )
-    filters: 
+    filters:
       - query(datediff('day', created_at::date, current_date::date ) <= 30)
   - name: Median Cycle Time By Repository This Month
     model: ref(closed github pull requests)
     cohort_on: "'Median'"
-    target_name: "{{env_var('GITHUB_TARGET')}}"
     props:
-      type: bar 
+      type: bar
       x: query( repo )
       y: query( median(cycle_time_hrs) )
-    filters: 
+    filters:
       - query(datediff('day', created_at::date, current_date::date ) <= 30)
   - name: Average Cycle Time By User This Month
     model: ref(closed github pull requests)
     cohort_on: "'Average'"
-    target_name: "{{env_var('GITHUB_TARGET')}}"
     props:
-      type: bar 
+      type: bar
       x: query( author )
       y: query( avg(cycle_time_hrs) )
-    filters: 
+    filters:
       - query(datediff('day', created_at::date, current_date::date ) <= 30)
   - name: Median Cycle Time By User This Month
     model: ref(closed github pull requests)
     cohort_on: "'Median'"
-    target_name: "{{env_var('GITHUB_TARGET')}}"
     props:
-      type: bar 
+      type: bar
       x: query( author )
       y: query( median(cycle_time_hrs) )
-    filters: 
+    filters:
       - query(datediff('day', created_at::date, current_date::date ) <= 30)
   - name: Pull Request by Repository
     model: ref(opened github pull requests)
     cohort_on: name
-    target_name: "{{env_var('GITHUB_TARGET')}}"
     props:
       type: bar
       x: query( name )
@@ -117,7 +112,6 @@ traces:
   - name: Pull Request by User
     model: ref(opened github pull requests)
     cohort_on: author
-    target_name: "{{env_var('GITHUB_TARGET')}}"
     props:
       type: bar
       x: query( author )
@@ -125,7 +119,6 @@ traces:
   - name: Pull Request Reviews by Repository
     model: ref(submitted github pull requests reviews)
     cohort_on: name
-    target_name: "{{env_var('GITHUB_TARGET')}}"
     props:
       type: bar
       x: query( name )
@@ -133,7 +126,6 @@ traces:
   - name: Pull Request Reviews by User
     model: ref(submitted github pull requests reviews)
     cohort_on: reviewer
-    target_name: "{{env_var('GITHUB_TARGET')}}"
     props:
       type: bar
       x: query( reviewer )
@@ -141,43 +133,49 @@ traces:
 
 charts:
   - name: Cycle Time in the Past 30 days By Repository
-    traces: 
+    traces:
       - ref(Average Cycle Time By Repository This Month)
       - ref(Median Cycle Time By Repository This Month)
-    layout: 
-      title: Cycle Hours in the Past 30 days By Repository
+    layout:
+      title:
+        text: Cycle Hours in the Past 30 days By Repository
   - name: Cycle Time in the Past 30 days By User
-    traces: 
+    traces:
       - ref(Average Cycle Time By User This Month)
       - ref(Median Cycle Time By User This Month)
-    layout: 
-      title: Cycle Hours in the Past 30 days By User
+    layout:
+      title:
+        text: Cycle Hours in the Past 30 days By User
   - name: Pull Requests by Repository
     traces:
       - ref(Pull Request by Repository)
     layout:
-      title: "Pull Request by Repository"
+      title:
+        text: "Pull Request by Repository"
   - name: Pull Requests by User
     traces:
       - ref(Pull Request by User)
     layout:
-      title: "Pull Request by User"
+      title:
+        text: "Pull Request by User"
   - name: Pull Requests Reviews by Repository
     traces:
       - ref(Pull Request Reviews by Repository)
     layout:
-      title: "Pull Request Reviews by Repository"
+      title:
+        text: "Pull Request Reviews by Repository"
   - name: Pull Requests Reviews by User
     traces:
       - ref(Pull Request Reviews by User)
     layout:
-      title: "Pull Request Reviews by User"
+      title:
+        text: "Pull Request Reviews by User"
   - name: Average Cycle Time Big Number
-    traces: 
+    traces:
       - ref(Average Cycle Time Indicator)
   - name: Pull Request Opens Big Number
-    traces: 
+    traces:
       - ref(Pull Request Opens Indicator)
   - name: Pull Request Reviews Big Number
-    traces: 
+    traces:
       - ref(Pull Request Reviews Indicator)
