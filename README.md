@@ -1,5 +1,9 @@
 # Visivo Github Dashboard
 
+# Example
+
+The [example](example) folder has a complete working example.  It is deployed with `visivo dist` to Netlify to and is available [here](https://visivo-github-dashboard.netlify.app/).
+
 # Usage
 
 This dashboard uses a Fivetran Webhook to Warehouse pipeline.  Fivetran has a great way to consume webhooks and store them in a database.
