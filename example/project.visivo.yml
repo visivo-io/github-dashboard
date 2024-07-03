@@ -7,8 +7,8 @@ targets:
     warehouse: DEV
     db_schema: WEBHOOKS
     username: GITHUB
-    password: "{{env_var('GITHUB_SNOWFLAKE_PASSWORD')}}"
-    account: "{{env_var('GITHUB_SNOWFLAKE_ACCOUNT')}}"
+    password: "{{env_var('VISIVO_GITHUB_SNOWFLAKE_PASSWORD')}}"
+    account: "{{env_var('VISIVO_GITHUB_SNOWFLAKE_ACCOUNT')}}"
 
 includes:
   # - path: "visivo-io/github-dashboard.git@v1.0"
