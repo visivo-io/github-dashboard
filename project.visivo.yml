@@ -10,7 +10,7 @@ models:
           pull_request:created_at::timestamp_tz as created_at,
           pull_request:closed_at::timestamp_tz as closed_at,
           pull_request:merged_at::timestamp_tz as merged_at,
-          round(datediff('minute', created_at, merged_at)/60, 2) as cycle_time_hrs,
+          round(datediff('minute', pull_request:created_at, pull_request:merged_at)/60, 2) as cycle_time_hrs,
           pull_request:user:login::varchar as author
       FROM github 
       where pull_request is not null
