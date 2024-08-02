@@ -25,6 +25,7 @@ jobs:
           pip install visivo
           cd example
           visivo dist
+          cp ../_redirects dist
           cd ..
         env:
           VISIVO_GITHUB_SNOWFLAKE_ACCOUNT: ${{secrets.VISIVO_GITHUB_SNOWFLAKE_ACCOUNT}}
