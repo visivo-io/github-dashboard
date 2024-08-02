@@ -22,7 +22,7 @@ jobs:
 
       - name: Install and Build
         run: |
-          python -m pip install git+https://github.com/visivo-io/visivo.git@latest
+          pip install visivo
           cd example
           visivo dist
           cd ..
