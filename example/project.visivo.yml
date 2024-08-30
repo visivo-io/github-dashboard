@@ -15,7 +15,7 @@ includes:
   - path: "../project.visivo.yml" #can use for local development of the package
 
 dashboards:
-  - name: Github Metrics change
+  - name: Github Metrics
     rows:
       - height: small
         items:
